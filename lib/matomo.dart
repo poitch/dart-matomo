@@ -93,6 +93,7 @@ class MatomoTracker {
     if (enableLog ?? false) {
       logLevel = Level.FINE;
     }
+    log.level = logLevel;
 
     this.dequequeRate = dequequeRate ?? Duration(seconds: 10);
     assert(this.dequequeRate!.inMicroseconds > 0, 'Refresh rate must be higher than 0 microseconds');
