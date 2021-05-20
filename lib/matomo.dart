@@ -72,6 +72,7 @@ class MatomoTracker {
   String? url;
   late _Session session;
   late _Visitor visitor;
+  Campaign? campaign;
   Duration? dequequeRate;
   String? userAgent;
   String? contentBase;
@@ -87,14 +88,15 @@ class MatomoTracker {
   Queue<_Event> _queue = Queue();
   late Timer _timer;
 
-  initialize({required int siteId, required String url, String? visitorId, Duration? dequequeRate, bool? enableLog}) async {
+  initialize(
+      {required int siteId, required String url, String? visitorId, Duration? dequequeRate, bool? enableLog, Campaign? campaign}) async {
     this.siteId = siteId;
     this.url = url;
     if (enableLog ?? false) {
       logLevel = Level.FINE;
     }
     log.level = logLevel;
-
+    this.campaign = campaign;
     this.dequequeRate = dequequeRate ?? Duration(seconds: 10);
     assert(this.dequequeRate!.inMicroseconds > 0, 'Refresh rate must be higher than 0 microseconds');
 
@@ -254,6 +256,13 @@ class MatomoTracker {
   }
 }
 
+class Campaign {
+  final String name;
+  final String keyword;
+
+  Campaign(this.name, this.keyword);
+}
+
 class _Session {
   final DateTime? firstVisit;
   final DateTime? lastVisit;
@@ -302,6 +311,13 @@ class _Event {
       map['cid'] = this.tracker.visitor.forcedId;
     }
     map['uid'] = this.tracker.visitor.userId;
+
+    // Campaign
+
+    if (this.tracker.campaign != null) {
+      map['_rcn'] = this.tracker.campaign!.name;
+      map['_rck'] = this.tracker.campaign!.keyword;
+    }
 
     // Session
     map['_idvc'] = this.tracker.session.visitCount.toString();
