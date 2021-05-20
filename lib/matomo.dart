@@ -78,6 +78,7 @@ class MatomoTracker {
   int? width;
   int? height;
 
+  Level logLevel = Level.OFF;
   bool initialized = false;
   bool? _optout = false;
 
@@ -86,13 +87,17 @@ class MatomoTracker {
   Queue<_Event> _queue = Queue();
   late Timer _timer;
 
-  initialize({required int siteId, required String url, String? visitorId, Duration? dequequeRate}) async {
+  initialize({required int siteId, required String url, String? visitorId, Duration? dequequeRate, bool? enableLog}) async {
     this.siteId = siteId;
     this.url = url;
+    if (enableLog ?? false) {
+      logLevel = Level.FINE;
+    }
+
     this.dequequeRate = dequequeRate ?? Duration(seconds: 10);
     assert(this.dequequeRate!.inMicroseconds > 0, 'Refresh rate must be higher than 0 microseconds');
 
-    _dispatcher = _MatomoDispatcher(url);
+    _dispatcher = _MatomoDispatcher(url, logLevel);
 
     // User agent
     if (kIsWeb) {
@@ -160,7 +165,7 @@ class MatomoTracker {
       _prefs!.setBool(kOptOut, _optout!);
     }
 
-    log.fine(
+    log.log(logLevel,
         'Matomo Initialized: firstVisit=$firstVisit; lastVisit=$lastVisit; visitCount=$visitCount; visitorId=$visitorId; contentBase=$contentBase; resolution=${width}x$height; userAgent=$userAgent');
     this.initialized = true;
 
@@ -238,7 +243,7 @@ class MatomoTracker {
 
   void _dequeue() {
     assert(initialized);
-    log.fine('Processing queue ${_queue.length}');
+    log.log(logLevel, 'Processing queue ${_queue.length}');
     while (_queue.length > 0) {
       var event = _queue.removeFirst();
       if (!_optout!) {
@@ -340,8 +345,8 @@ class _Event {
 
 class _MatomoDispatcher {
   final String baseUrl;
-
-  _MatomoDispatcher(this.baseUrl);
+  final Level logLevel;
+  _MatomoDispatcher(this.baseUrl, this.logLevel);
 
   void send(_Event event) {
     var headers = {
@@ -354,13 +359,13 @@ class _MatomoDispatcher {
       var value = Uri.encodeFull(map[key].toString());
       url = '$url$key=$value&';
     }
-    event.tracker.log.fine(' -> $url');
+    event.tracker.log.log(logLevel, ' -> $url');
     http.post(Uri.parse(url), headers: headers).then((http.Response response) {
       final int statusCode = response.statusCode;
-      event.tracker.log.fine(' <- $statusCode');
+      event.tracker.log.log(logLevel, ' <- $statusCode');
       if (statusCode != 200) {}
     }).catchError((e) {
-      event.tracker.log.fine(' <- ${e.toString()}');
+      event.tracker.log.log(logLevel, ' <- ${e.toString()}');
     });
   }
 }
