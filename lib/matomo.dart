@@ -79,7 +79,7 @@ class MatomoTracker {
   int? width;
   int? height;
 
-  Level logLevel = Level.OFF;
+  bool _enableLog = false;
   bool initialized = false;
   bool? _optout = false;
 
@@ -92,15 +92,13 @@ class MatomoTracker {
       {required int siteId, required String url, String? visitorId, Duration? dequequeRate, bool? enableLog, Campaign? campaign}) async {
     this.siteId = siteId;
     this.url = url;
-    if (enableLog ?? false) {
-      logLevel = Level.FINE;
-    }
-    log.level = logLevel;
+    this._enableLog = enableLog ?? false;
+
     this.campaign = campaign;
     this.dequequeRate = dequequeRate ?? Duration(seconds: 10);
     assert(this.dequequeRate!.inMicroseconds > 0, 'Refresh rate must be higher than 0 microseconds');
 
-    _dispatcher = _MatomoDispatcher(url, logLevel);
+    _dispatcher = _MatomoDispatcher(url);
 
     // User agent
     if (kIsWeb) {
@@ -168,8 +166,9 @@ class MatomoTracker {
       _prefs!.setBool(kOptOut, _optout!);
     }
 
-    log.log(logLevel,
-        'Matomo Initialized: firstVisit=$firstVisit; lastVisit=$lastVisit; visitCount=$visitCount; visitorId=$visitorId; contentBase=$contentBase; resolution=${width}x$height; userAgent=$userAgent');
+    if (_enableLog)
+      log.fine(
+          'Matomo Initialized: firstVisit=$firstVisit; lastVisit=$lastVisit; visitCount=$visitCount; visitorId=$visitorId; contentBase=$contentBase; resolution=${width}x$height; userAgent=$userAgent');
     this.initialized = true;
 
     _timer = Timer.periodic(this.dequequeRate!, (timer) {
@@ -246,7 +245,7 @@ class MatomoTracker {
 
   void _dequeue() {
     assert(initialized);
-    log.log(logLevel, 'Processing queue ${_queue.length}');
+    if (_enableLog) log.fine('Processing queue ${_queue.length}');
     while (_queue.length > 0) {
       var event = _queue.removeFirst();
       if (!_optout!) {
@@ -362,8 +361,7 @@ class _Event {
 
 class _MatomoDispatcher {
   final String baseUrl;
-  final Level logLevel;
-  _MatomoDispatcher(this.baseUrl, this.logLevel);
+  _MatomoDispatcher(this.baseUrl);
 
   void send(_Event event) {
     var headers = {
@@ -376,13 +374,13 @@ class _MatomoDispatcher {
       var value = Uri.encodeFull(map[key].toString());
       url = '$url$key=$value&';
     }
-    event.tracker.log.log(logLevel, ' -> $url');
+    if (event.tracker._enableLog) event.tracker.log.fine(' -> $url');
     http.post(Uri.parse(url), headers: headers).then((http.Response response) {
       final int statusCode = response.statusCode;
-      event.tracker.log.log(logLevel, ' <- $statusCode');
+      if (event.tracker._enableLog) event.tracker.log.fine(' <- $statusCode');
       if (statusCode != 200) {}
     }).catchError((e) {
-      event.tracker.log.log(logLevel, ' <- ${e.toString()}');
+      if (event.tracker._enableLog) event.tracker.log.fine(' <- ${e.toString()}');
     });
   }
 }
