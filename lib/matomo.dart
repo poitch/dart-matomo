@@ -256,10 +256,14 @@ class MatomoTracker {
 }
 
 class Campaign {
-  final String name;
-  final String keyword;
+  final String? name;
+  final String? keyword;
 
   Campaign(this.name, this.keyword);
+
+  Campaign.fromUtmParameters(Map<String, dynamic> json)
+      : this.name = json['utm_campaign'] ?? (json['utm_medium'] ?? json['utm_source ']),
+        this.keyword = json['utm_term '];
 }
 
 class _Session {
@@ -313,9 +317,9 @@ class _Event {
 
     // Campaign
 
-    if (this.tracker.campaign != null) {
+    if (this.tracker.campaign != null && this.tracker.campaign!.name != null) {
       map['_rcn'] = this.tracker.campaign!.name;
-      map['_rck'] = this.tracker.campaign!.keyword;
+      if (this.tracker.campaign!.keyword != null) map['_rck'] = this.tracker.campaign!.keyword;
     }
 
     // Session
