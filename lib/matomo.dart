@@ -94,7 +94,7 @@ class MatomoTracker {
     this.url = url;
     this._enableLog = enableLog ?? false;
 
-    this.campaign = campaign;
+    addCampaign(campaign);
     this.dequequeRate = dequequeRate ?? Duration(seconds: 10);
     assert(this.dequequeRate!.inMicroseconds > 0, 'Refresh rate must be higher than 0 microseconds');
 
@@ -181,6 +181,10 @@ class MatomoTracker {
   void setOptOut(bool optout) {
     _optout = optout;
     _prefs!.setBool(kOptOut, _optout!);
+  }
+
+  void addCampaign(Campaign? campaign) {
+    this.campaign = campaign;
   }
 
   void clear() {
