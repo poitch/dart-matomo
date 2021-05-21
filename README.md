@@ -2,6 +2,9 @@
 
 A Dart Client for Matomo. This is completely written in Dart and works cross-platform, including web.
 
+```
+Forked from: https://github.com/poitch/dart-matomo
+```
 ## Getting Started
 
 ```
