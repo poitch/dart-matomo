@@ -266,8 +266,8 @@ class Campaign {
   Campaign(this.name, this.keyword);
 
   Campaign.fromUtmParameters(Map<String, dynamic> json)
-      : this.name = json['utm_campaign'] ?? (json['utm_medium'] ?? json['utm_source ']),
-        this.keyword = json['utm_term '];
+      : this.name = json['utm_campaign'] ?? (json['utm_medium'] ?? json['utm_source']),
+        this.keyword = json['utm_term'];
 }
 
 class _Session {
