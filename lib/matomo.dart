@@ -409,7 +409,7 @@ class _MatomoDispatcher {
       event.tracker.log.fine(' <- $statusCode');
       if (statusCode != 200) {
         //ToDo Error response
-        print("Status code is unequal to 200. This is a test!!######");
+        print("Status code is unequal to 200. This is a test!!###### V1.0.1");
       }
     }).catchError((e) {
       event.tracker.log.fine(' <- ${e.toString()}');
