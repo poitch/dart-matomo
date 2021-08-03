@@ -269,6 +269,7 @@ class MatomoTracker {
     assert(initialized);
     log.finest('Processing queue ${_queue.length}');
     while (_queue.length > 0) {
+      // ToDo only deque if success
       var event = _queue.removeFirst();
       if (!_optout!) {
         _dispatcher.send(event);
@@ -406,7 +407,10 @@ class _MatomoDispatcher {
     http.post(Uri.parse(url), headers: headers).then((http.Response response) {
       final int statusCode = response.statusCode;
       event.tracker.log.fine(' <- $statusCode');
-      if (statusCode != 200) {}
+      if (statusCode != 200) {
+        //ToDo Error response
+        print("Status code is unequal to 200. This is a test!!######");
+      }
     }).catchError((e) {
       event.tracker.log.fine(' <- ${e.toString()}');
     });
