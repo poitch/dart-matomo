@@ -269,10 +269,10 @@ class MatomoTracker {
     assert(initialized);
     log.finest('Processing queue ${_queue.length}');
     while (_queue.length > 0) {
-      // ToDo only deque if success
-      var event = _queue.removeFirst();
+      var event = _queue.first;
       if (!_optout!) {
-        _dispatcher.send(event);
+       int statusCode = _dispatcher.send(event);
+       if (statusCode == 200){_queue.removeFirst();}
       }
     }
   }
@@ -391,7 +391,7 @@ class _MatomoDispatcher {
 
   _MatomoDispatcher(this.baseUrl);
 
-  void send(_Event event) {
+  int send(_Event event)  {
     var headers = {
       if (!kIsWeb && event.tracker.userAgent != null)
         'User-Agent': event.tracker.userAgent!,
@@ -407,12 +407,17 @@ class _MatomoDispatcher {
     http.post(Uri.parse(url), headers: headers).then((http.Response response) {
       final int statusCode = response.statusCode;
       event.tracker.log.fine(' <- $statusCode');
+      if (statusCode == 200){ return statusCode;}
       if (statusCode != 200) {
         //ToDo Error response
         print("Status code is unequal to 200. This is a test!!###### V1.0.1");
+        return statusCode;
       }
     }).catchError((e) {
       event.tracker.log.fine(' <- ${e.toString()}');
+      return 1;
     });
+    // This point should never be reached
+    return 1000;
   }
 }
