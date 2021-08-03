@@ -108,7 +108,7 @@ class MatomoTracker {
     required String url,
     String? visitorId,
     String? contentBaseUrl,
-    int dequeueInterval = 10
+    int dequeueInterval = 5
   }) async {
     this.siteId = siteId;
     this.url = url;
@@ -191,6 +191,7 @@ class MatomoTracker {
     this.initialized = true;
 
     _timer = Timer.periodic(Duration(seconds: dequeueInterval), (timer) {
+      print("Try to dequeue");
       this._dequeue();
     });
   }
@@ -270,8 +271,9 @@ class MatomoTracker {
     log.finest('Processing queue ${_queue.length}');
     while (_queue.length > 0) {
       // ToDo only deque if success
-      var event = _queue.removeFirst();
+      var event = _queue.first;
       if (!_optout!) {
+        _queue.removeFirst();
         _dispatcher.send(event);
       }
     }
