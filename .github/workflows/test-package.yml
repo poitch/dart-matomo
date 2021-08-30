@@ -12,7 +12,11 @@ jobs:
 
     - name: Setup Dart
       uses: dart-lang/setup-dart@v1
-
+    # Setup flutter 
+    - name: "Setup Flutter"
+      uses: subosito/flutter-action@v1
+      with:
+        channel: 'stable' 
     - name: Install dependencies
       run: flutter pub get
 
