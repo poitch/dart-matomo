@@ -1,0 +1,26 @@
+name: test-sdk
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    
+    - name: Chekout code
+      uses: actions/checkout@v2
+
+    - name: Setup Dart
+      uses: dart-lang/setup-dart@v1
+
+    - name: Install dependencies
+      run: dart pub get
+
+    - name: Check for formatting issues (run "flutter format . ")
+      run: dart format --set-exit-if-changed .
+
+    - name: Analyze project
+      run: dart analyze
+
+    - name: Run tests
+      run: dart test test/
