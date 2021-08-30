@@ -26,5 +26,9 @@ jobs:
     - name: Analyze project
       run: dart analyze
 
+
+    - name: Run tests 1
+      run: dart pub add --dev test
+      
     - name: Run tests
       run: dart test test/
