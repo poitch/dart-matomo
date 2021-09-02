@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     
-    - name: Chekout code
+    - name: Checkout code
       uses: actions/checkout@v2
 
     - name: Setup Dart
