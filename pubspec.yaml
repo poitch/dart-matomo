@@ -10,7 +10,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  fk_user_agent: ^2.0.1
+  fk_user_agent:
+    git:
+      url: git://github.com/Bringoff/fk_user_agent.git
+      ref: apple-silicon-simulator-run-fix
   http: ^0.13.1
   uuid: ^3.0.3
   package_info: ^2.0.0
