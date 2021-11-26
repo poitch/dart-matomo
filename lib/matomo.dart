@@ -251,14 +251,14 @@ class MatomoTracker {
     ));
   }
 
-  static void trackEvent(String eventName, String eventAction,
-      {String? widgetName, int? eventValue}) {
+  static void trackEvent({required String category, 
+  required String action, String? name, num? eventValue}) {
     var tracker = MatomoTracker();
     tracker._track(_Event(
       tracker: tracker,
-      eventAction: eventAction,
-      eventName: eventName,
-      eventCategory: widgetName,
+      eventAction: action,
+      eventName: name,
+      eventCategory: category,
       eventValue: eventValue,
     ));
   }
@@ -362,7 +362,7 @@ class _Event {
   final String? eventCategory;
   final String? eventAction;
   final String? eventName;
-  final int? eventValue;
+  final num? eventValue;
   final int? goalId;
 
   // Ecommerce
