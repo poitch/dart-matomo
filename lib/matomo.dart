@@ -88,6 +88,7 @@ class MatomoTracker {
 
   int? siteId;
   String? url;
+  Map<String, String>? customData;
   late _Session session;
   late _Visitor visitor;
   String? userAgent;
@@ -111,9 +112,11 @@ class MatomoTracker {
     String? contentBaseUrl,
     int dequeueInterval = 10,
     String? tokenAuth,
+    Map<String, String>? customData,
   }) async {
     this.siteId = siteId;
     this.url = url;
+    this.customData = customData;
 
     _dispatcher = _MatomoDispatcher(url, tokenAuth);
 
@@ -229,7 +232,8 @@ class MatomoTracker {
     trackScreenWithName(widgetName, eventName);
   }
 
-  static void trackScreenWithName(String widgetName, String eventName) {
+  static void trackScreenWithName(String widgetName, String eventName,
+      {Map<String, String>? customData}) {
     // From https://gitlab.com/petleo-and-iatros-opensource/flutter_matomo/blob/master/lib/flutter_matomo.dart
     // trackScreen(widgetName: widgetName, eventName: eventName);
     // -> track().screen(widgetName).with(tracker)
@@ -239,20 +243,31 @@ class MatomoTracker {
     tracker._track(_Event(
       tracker: tracker,
       action: widgetName,
+      customData: customData,
     ));
   }
 
-  static void trackGoal(int goalId, {double? revenue}) {
+  static void trackGoal(
+    int goalId, {
+    double? revenue,
+    Map<String, String>? customData,
+  }) {
     var tracker = MatomoTracker();
     tracker._track(_Event(
       tracker: tracker,
       goalId: goalId,
       revenue: revenue,
+      customData: customData,
     ));
   }
 
-  static void trackEvent(String eventName, String eventAction,
-      {String? widgetName, int? eventValue}) {
+  static void trackEvent(
+    String eventName,
+    String eventAction, {
+    String? widgetName,
+    int? eventValue,
+    Map<String, String>? customData,
+  }) {
     var tracker = MatomoTracker();
     tracker._track(_Event(
       tracker: tracker,
@@ -260,6 +275,7 @@ class MatomoTracker {
       eventName: eventName,
       eventCategory: widgetName,
       eventValue: eventValue,
+      customData: customData,
     ));
   }
 
@@ -373,6 +389,8 @@ class _Event {
   final num? taxAmount;
   final num? shippingCost;
   final num? discountAmount;
+  // Additional data to send to the Matomo server. Such as Custom Dimensions
+  final Map<String, String>? customData;
 
   late DateTime _date;
 
@@ -391,6 +409,7 @@ class _Event {
     this.taxAmount,
     this.shippingCost,
     this.discountAmount,
+    this.customData,
   }) {
     _date = DateTime.now().toUtc();
   }
@@ -443,6 +462,10 @@ class _Event {
     // Screen Resolution
     map['res'] = '${this.tracker.width}x${this.tracker.height}';
 
+    final trackerCustomData = tracker.customData;
+    if (trackerCustomData != null) {
+      map.addAll(trackerCustomData);
+    }
     // Goal
     if (goalId != null) {
       map['idgoal'] = goalId;
@@ -484,6 +507,11 @@ class _Event {
     }
     if (discountAmount != null) {
       map['ec_dt'] = discountAmount;
+    }
+
+    final custom = customData;
+    if (custom != null) {
+      map.addAll(custom);
     }
 
     return map;
