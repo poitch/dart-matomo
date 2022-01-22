@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 
@@ -128,7 +129,7 @@ class MatomoTracker {
         await FkUserAgent.init();
         userAgent = FkUserAgent.webViewUserAgent;
       } catch (_) {
-        userAgent = 'Unknown';
+        userAgent = _defaultUserAgent();
       }
     }
 
@@ -198,6 +199,18 @@ class MatomoTracker {
     _timer = Timer.periodic(Duration(seconds: dequeueInterval), (timer) {
       this._dequeue();
     });
+  }
+
+  String _defaultUserAgent() {
+    if (Platform.isMacOS) {
+      return 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36';
+    } else if (Platform.isWindows) {
+      return 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36';
+    } else if (Platform.isLinux) {
+      return 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36';
+    } else {
+      return 'Unknown';
+    }
   }
 
   bool? get optOut => _optout;
@@ -389,6 +402,7 @@ class _Event {
   final num? taxAmount;
   final num? shippingCost;
   final num? discountAmount;
+
   // Additional data to send to the Matomo server. Such as Custom Dimensions
   final Map<String, String>? customData;
 
