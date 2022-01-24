@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 
@@ -88,6 +89,7 @@ class MatomoTracker {
 
   int? siteId;
   String? url;
+  Map<String, String>? customData;
   late _Session session;
   late _Visitor visitor;
   String? userAgent;
@@ -111,9 +113,11 @@ class MatomoTracker {
     String? contentBaseUrl,
     int dequeueInterval = 10,
     String? tokenAuth,
+    Map<String, String>? customData,
   }) async {
     this.siteId = siteId;
     this.url = url;
+    this.customData = customData;
 
     _dispatcher = _MatomoDispatcher(url, tokenAuth);
 
@@ -125,7 +129,7 @@ class MatomoTracker {
         await FkUserAgent.init();
         userAgent = FkUserAgent.webViewUserAgent;
       } catch (_) {
-        userAgent = 'Unknown';
+        userAgent = _defaultUserAgent();
       }
     }
 
@@ -197,6 +201,18 @@ class MatomoTracker {
     });
   }
 
+  String _defaultUserAgent() {
+    if (Platform.isMacOS) {
+      return 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36';
+    } else if (Platform.isWindows) {
+      return 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36';
+    } else if (Platform.isLinux) {
+      return 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36';
+    } else {
+      return 'Unknown';
+    }
+  }
+
   bool? get optOut => _optout;
 
   void setOptOut(bool optout) {
@@ -229,7 +245,8 @@ class MatomoTracker {
     trackScreenWithName(widgetName, eventName);
   }
 
-  static void trackScreenWithName(String widgetName, String eventName) {
+  static void trackScreenWithName(String widgetName, String eventName,
+      {Map<String, String>? customData}) {
     // From https://gitlab.com/petleo-and-iatros-opensource/flutter_matomo/blob/master/lib/flutter_matomo.dart
     // trackScreen(widgetName: widgetName, eventName: eventName);
     // -> track().screen(widgetName).with(tracker)
@@ -239,20 +256,31 @@ class MatomoTracker {
     tracker._track(_Event(
       tracker: tracker,
       action: widgetName,
+      customData: customData,
     ));
   }
 
-  static void trackGoal(int goalId, {double? revenue}) {
+  static void trackGoal(
+    int goalId, {
+    double? revenue,
+    Map<String, String>? customData,
+  }) {
     var tracker = MatomoTracker();
     tracker._track(_Event(
       tracker: tracker,
       goalId: goalId,
       revenue: revenue,
+      customData: customData,
     ));
   }
 
-  static void trackEvent(String eventName, String eventAction,
-      {String? widgetName, int? eventValue}) {
+  static void trackEvent(
+    String eventName,
+    String eventAction, {
+    String? widgetName,
+    int? eventValue,
+    Map<String, String>? customData,
+  }) {
     var tracker = MatomoTracker();
     tracker._track(_Event(
       tracker: tracker,
@@ -260,6 +288,7 @@ class MatomoTracker {
       eventName: eventName,
       eventCategory: widgetName,
       eventValue: eventValue,
+      customData: customData,
     ));
   }
 
@@ -374,6 +403,9 @@ class _Event {
   final num? shippingCost;
   final num? discountAmount;
 
+  // Additional data to send to the Matomo server. Such as Custom Dimensions
+  final Map<String, String>? customData;
+
   late DateTime _date;
 
   _Event({
@@ -391,6 +423,7 @@ class _Event {
     this.taxAmount,
     this.shippingCost,
     this.discountAmount,
+    this.customData,
   }) {
     _date = DateTime.now().toUtc();
   }
@@ -443,6 +476,10 @@ class _Event {
     // Screen Resolution
     map['res'] = '${this.tracker.width}x${this.tracker.height}';
 
+    final trackerCustomData = tracker.customData;
+    if (trackerCustomData != null) {
+      map.addAll(trackerCustomData);
+    }
     // Goal
     if (goalId != null) {
       map['idgoal'] = goalId;
@@ -484,6 +521,11 @@ class _Event {
     }
     if (discountAmount != null) {
       map['ec_dt'] = discountAmount;
+    }
+
+    final custom = customData;
+    if (custom != null) {
+      map.addAll(custom);
     }
 
     return map;
