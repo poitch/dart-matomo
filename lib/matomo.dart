@@ -4,16 +4,16 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:fk_user_agent/fk_user_agent.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fk_user_agent/fk_user_agent.dart';
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
 import 'package:matomo/random_alpha_numeric.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uuid/uuid.dart';
 import 'package:universal_html/html.dart' as html;
+import 'package:uuid/uuid.dart';
 
 abstract class TraceableStatelessWidget extends StatelessWidget {
   final String name;
@@ -95,6 +95,7 @@ class MatomoTracker {
   int? width;
   int? height;
   String? currentScreenId;
+  Map<int, String> customDimensions = {};
 
   bool initialized = false;
   bool? _optout = false;
@@ -305,6 +306,11 @@ class MatomoTracker {
     ));
   }
 
+  static void setCustomDimension(int dimensionId, String dimensionValue) {
+    final tracker = MatomoTracker();
+    tracker.customDimensions[dimensionId] = dimensionValue;
+  }
+
   void _track(_Event event) {
     _queue.add(event);
   }
@@ -485,6 +491,11 @@ class _Event {
     if (discountAmount != null) {
       map['ec_dt'] = discountAmount;
     }
+
+    final customDimensions = tracker.customDimensions
+        .map((id, value) => MapEntry("dimension$id", value));
+
+    map.addAll(customDimensions);
 
     return map;
   }
