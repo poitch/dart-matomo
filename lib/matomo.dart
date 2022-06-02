@@ -357,19 +357,6 @@ class _Event {
     }
     map['uid'] = this.tracker.visitor.userId;
 
-    // Campaign
-
-    if (this.tracker.campaign != null) {
-      if (this.tracker.campaign!.name != null) {
-        map['_rcn'] = this.tracker.campaign!.name;
-      }
-      if (this.tracker.campaign!.gclid != null) {
-        map['gclid'] = this.tracker.campaign!.gclid;
-      }
-      if (this.tracker.campaign!.keyword != null)
-        map['_rck'] = this.tracker.campaign!.keyword;
-    }
-
     // Session
     map['_idvc'] = this.tracker.session.visitCount.toString();
     map['_viewts'] =
@@ -377,7 +364,26 @@ class _Event {
     map['_idts'] =
         this.tracker.session.firstVisit!.millisecondsSinceEpoch ~/ 1000;
 
-    map['url'] = '${this.tracker.contentBase}/$action';
+    final url = Uri.parse('${this.tracker.contentBase}/$action');
+
+    // Campaign
+
+    if (this.tracker.campaign != null) {
+      if (this.tracker.campaign!.name != null) {
+        map['_rcn'] = this.tracker.campaign!.name;
+        url.queryParameters['utm_campaign'] = this.tracker.campaign!.name!;
+      }
+      if (this.tracker.campaign!.gclid != null) {
+        map['gclid'] = this.tracker.campaign!.gclid;
+        url.queryParameters['gclid'] = this.tracker.campaign!.gclid!;
+      }
+      if (this.tracker.campaign!.keyword != null)
+        map['_rck'] = this.tracker.campaign!.keyword;
+      url.queryParameters['utm_term'] = this.tracker.campaign!.keyword!;
+    }
+
+    map['url'] = url.toString();
+
     map['action_name'] = action;
 
     final locale = window.locale;
