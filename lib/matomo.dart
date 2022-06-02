@@ -376,14 +376,14 @@ class _Event {
         entries.addEntries(
             [MapEntry('utm_campaign', this.tracker.campaign!.name!)]);
       }
-      if (this.tracker.campaign!.gclid != null) {
-        map['gclid'] = this.tracker.campaign!.gclid;
-        entries.addEntries([MapEntry('gclid', this.tracker.campaign!.gclid!)]);
-      }
       if (this.tracker.campaign!.keyword != null) {
         map['_rck'] = this.tracker.campaign!.keyword;
         entries.addEntries(
             [MapEntry('utm_term', this.tracker.campaign!.keyword!)]);
+      }
+      if (this.tracker.campaign!.gclid != null) {
+        map['gclid'] = this.tracker.campaign!.gclid;
+        entries.addEntries([MapEntry('gclid', this.tracker.campaign!.gclid!)]);
       }
 
       if (entries.isNotEmpty) {
