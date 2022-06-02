@@ -369,17 +369,26 @@ class _Event {
     // Campaign
 
     if (this.tracker.campaign != null) {
+      final entries = <String, String>{};
+
       if (this.tracker.campaign!.name != null) {
         map['_rcn'] = this.tracker.campaign!.name;
-        url.queryParameters['utm_campaign'] = this.tracker.campaign!.name!;
+        entries.addEntries(
+            [MapEntry('utm_campaign', this.tracker.campaign!.name!)]);
       }
       if (this.tracker.campaign!.gclid != null) {
         map['gclid'] = this.tracker.campaign!.gclid;
-        url.queryParameters['gclid'] = this.tracker.campaign!.gclid!;
+        entries.addEntries([MapEntry('gclid', this.tracker.campaign!.gclid!)]);
       }
-      if (this.tracker.campaign!.keyword != null)
+      if (this.tracker.campaign!.keyword != null) {
         map['_rck'] = this.tracker.campaign!.keyword;
-      url.queryParameters['utm_term'] = this.tracker.campaign!.keyword!;
+        entries.addEntries(
+            [MapEntry('utm_term', this.tracker.campaign!.keyword!)]);
+      }
+
+      if (entries.isNotEmpty) {
+        url.queryParameters.addAll(entries);
+      }
     }
 
     map['url'] = url.toString();
