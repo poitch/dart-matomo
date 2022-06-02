@@ -364,7 +364,7 @@ class _Event {
     map['_idts'] =
         this.tracker.session.firstVisit!.millisecondsSinceEpoch ~/ 1000;
 
-    final url = Uri.parse('${this.tracker.contentBase}/$action');
+    var url = Uri.parse('${this.tracker.contentBase}/$action');
 
     // Campaign
 
@@ -386,8 +386,12 @@ class _Event {
         entries.addEntries([MapEntry('gclid', this.tracker.campaign!.gclid!)]);
       }
 
+      if (url.hasQuery) {
+        entries.addAll(url.queryParameters);
+      }
+
       if (entries.isNotEmpty) {
-        url.queryParameters.addAll(entries);
+        url = url.replace(queryParameters: entries);
       }
     }
 
