@@ -443,10 +443,10 @@ class _MatomoDispatcher {
         'User-Agent': event.tracker.userAgent!,
     };
 
-    var map = event.toMap();
+    final map = event.toMap();
     var url = '$baseUrl?';
     for (String key in map.keys) {
-      var value = Uri.encodeFull(map[key].toString());
+      final value = Uri.encodeComponent(map[key].toString());
       url = '$url$key=$value&';
     }
     if (event.tracker._enableLog) event.tracker.log.fine(' -> $url');
