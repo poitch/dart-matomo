@@ -17,15 +17,11 @@ abstract class TraceableStatelessWidget extends StatelessWidget {
   final String name;
   final String title;
 
-  const TraceableStatelessWidget(
-      {this.name = '', this.title = 'WidgetCreated', Key? key})
-      : super(key: key);
+  const TraceableStatelessWidget({this.name = '', this.title = 'WidgetCreated', Key? key}) : super(key: key);
 
   @override
   StatelessElement createElement() {
-    MatomoTracker.trackScreenWithName(
-        this.name.isEmpty ? this.runtimeType.toString() : this.name,
-        this.title);
+    MatomoTracker.trackScreenWithName(this.name.isEmpty ? this.runtimeType.toString() : this.name, this.title);
     return StatelessElement(this);
   }
 }
@@ -34,15 +30,11 @@ abstract class TraceableStatefulWidget extends StatefulWidget {
   final String name;
   final String title;
 
-  const TraceableStatefulWidget(
-      {this.name = '', this.title = 'WidgetCreated', Key? key})
-      : super(key: key);
+  const TraceableStatefulWidget({this.name = '', this.title = 'WidgetCreated', Key? key}) : super(key: key);
 
   @override
   StatefulElement createElement() {
-    MatomoTracker.trackScreenWithName(
-        this.name.isEmpty ? this.runtimeType.toString() : this.name,
-        this.title);
+    MatomoTracker.trackScreenWithName(this.name.isEmpty ? this.runtimeType.toString() : this.name, this.title);
     return StatefulElement(this);
   }
 }
@@ -51,18 +43,12 @@ abstract class TraceableInheritedWidget extends InheritedWidget {
   final String name;
   final String title;
 
-  const TraceableInheritedWidget(
-      {this.name = '',
-      this.title = 'WidgetCreated',
-      Key? key,
-      required Widget child})
+  const TraceableInheritedWidget({this.name = '', this.title = 'WidgetCreated', Key? key, required Widget child})
       : super(key: key, child: child);
 
   @override
   InheritedElement createElement() {
-    MatomoTracker.trackScreenWithName(
-        this.name.isEmpty ? this.runtimeType.toString() : this.name,
-        this.title);
+    MatomoTracker.trackScreenWithName(this.name.isEmpty ? this.runtimeType.toString() : this.name, this.title);
     return InheritedElement(this);
   }
 }
@@ -115,8 +101,7 @@ class MatomoTracker {
 
     addCampaign(campaign);
     this.dequequeRate = dequequeRate ?? Duration(seconds: 10);
-    assert(this.dequequeRate!.inMicroseconds > 0,
-        'Refresh rate must be higher than 0 microseconds');
+    assert(this.dequequeRate!.inMicroseconds > 0, 'Refresh rate must be higher than 0 microseconds');
 
     _dispatcher = _MatomoDispatcher(url);
 
@@ -144,15 +129,13 @@ class MatomoTracker {
     _prefs = await SharedPreferences.getInstance();
 
     if (_prefs!.containsKey(kFirstVisit)) {
-      firstVisit =
-          DateTime.fromMillisecondsSinceEpoch(_prefs!.getInt(kFirstVisit)!);
+      firstVisit = DateTime.fromMillisecondsSinceEpoch(_prefs!.getInt(kFirstVisit)!);
     } else {
       _prefs!.setInt(kFirstVisit, firstVisit.millisecondsSinceEpoch);
     }
 
     if (_prefs!.containsKey(kLastVisit)) {
-      lastVisit =
-          DateTime.fromMillisecondsSinceEpoch(_prefs!.getInt(kLastVisit)!);
+      lastVisit = DateTime.fromMillisecondsSinceEpoch(_prefs!.getInt(kLastVisit)!);
     }
     // Now is the last visit.
     _prefs!.setInt(kLastVisit, lastVisit.millisecondsSinceEpoch);
@@ -162,8 +145,7 @@ class MatomoTracker {
     }
     _prefs!.setInt(kVisitCount, visitCount);
 
-    session = _Session(
-        firstVisit: firstVisit, lastVisit: lastVisit, visitCount: visitCount);
+    session = _Session(firstVisit: firstVisit, lastVisit: lastVisit, visitCount: visitCount);
 
     // Initialize Visitor
     if (visitorId == null) {
@@ -256,8 +238,7 @@ class MatomoTracker {
     ));
   }
 
-  static void trackEvent(String eventName, String eventAction,
-      {String? widgetName}) {
+  static void trackEvent(String eventName, String eventAction, {String? widgetName}) {
     var tracker = MatomoTracker();
     tracker._track(_Event(
       tracker: tracker,
@@ -295,8 +276,7 @@ class Campaign {
   });
 
   Campaign.fromUtmParameters(Map<String, dynamic> json)
-      : this.name =
-            json['utm_campaign'] ?? (json['utm_medium'] ?? json['utm_source']),
+      : this.name = json['utm_campaign'] ?? (json['utm_medium'] ?? json['utm_source']),
         this.keyword = json['utm_term'],
         this.gclid = json['gclid'];
 }
@@ -359,10 +339,8 @@ class _Event {
 
     // Session
     map['_idvc'] = this.tracker.session.visitCount.toString();
-    map['_viewts'] =
-        this.tracker.session.lastVisit!.millisecondsSinceEpoch ~/ 1000;
-    map['_idts'] =
-        this.tracker.session.firstVisit!.millisecondsSinceEpoch ~/ 1000;
+    map['_viewts'] = this.tracker.session.lastVisit!.millisecondsSinceEpoch ~/ 1000;
+    map['_idts'] = this.tracker.session.firstVisit!.millisecondsSinceEpoch ~/ 1000;
 
     var url = Uri.parse('${this.tracker.contentBase}/$action');
 
@@ -373,13 +351,11 @@ class _Event {
 
       if (this.tracker.campaign!.name != null) {
         map['_rcn'] = this.tracker.campaign!.name;
-        entries.addEntries(
-            [MapEntry('utm_campaign', this.tracker.campaign!.name!)]);
+        entries.addEntries([MapEntry('utm_campaign', this.tracker.campaign!.name!)]);
       }
       if (this.tracker.campaign!.keyword != null) {
         map['_rck'] = this.tracker.campaign!.keyword;
-        entries.addEntries(
-            [MapEntry('utm_term', this.tracker.campaign!.keyword!)]);
+        entries.addEntries([MapEntry('utm_term', this.tracker.campaign!.keyword!)]);
       }
       if (this.tracker.campaign!.gclid != null) {
         map['gclid'] = this.tracker.campaign!.gclid;
@@ -439,8 +415,7 @@ class _MatomoDispatcher {
 
   void send(_Event event) {
     var headers = {
-      if (!kIsWeb && event.tracker.userAgent != null)
-        'User-Agent': event.tracker.userAgent!,
+      if (!kIsWeb && event.tracker.userAgent != null) 'User-Agent': event.tracker.userAgent!,
     };
 
     final map = event.toMap();
@@ -455,8 +430,7 @@ class _MatomoDispatcher {
       if (event.tracker._enableLog) event.tracker.log.fine(' <- $statusCode');
       if (statusCode != 200) {}
     }).catchError((e) {
-      if (event.tracker._enableLog)
-        event.tracker.log.fine(' <- ${e.toString()}');
+      if (event.tracker._enableLog) event.tracker.log.fine(' <- ${e.toString()}');
     });
   }
 }
