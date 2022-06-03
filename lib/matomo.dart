@@ -89,12 +89,7 @@ class MatomoTracker {
   late Timer _timer;
 
   initialize(
-      {required int siteId,
-      required String url,
-      String? visitorId,
-      Duration? dequequeRate,
-      bool? enableLog,
-      Campaign? campaign}) async {
+      {required int siteId, required String url, String? visitorId, Duration? dequequeRate, bool? enableLog, Campaign? campaign}) async {
     this.siteId = siteId;
     this.url = url;
     this._enableLog = enableLog ?? false;
@@ -308,14 +303,7 @@ class _Event {
 
   late DateTime _date;
 
-  _Event(
-      {required this.tracker,
-      this.action,
-      this.eventCategory,
-      this.eventAction,
-      this.eventName,
-      this.goalId,
-      this.revenue}) {
+  _Event({required this.tracker, this.action, this.eventCategory, this.eventAction, this.eventName, this.goalId, this.revenue}) {
     _date = DateTime.now().toUtc();
   }
 
