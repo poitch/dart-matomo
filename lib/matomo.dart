@@ -262,12 +262,18 @@ class MatomoTracker {
 class Campaign {
   final String? name;
   final String? keyword;
+  final String? gclid;
 
-  Campaign(this.name, this.keyword);
+  Campaign(
+    this.name,
+    this.keyword, {
+    this.gclid,
+  });
 
   Campaign.fromUtmParameters(Map<String, dynamic> json)
       : this.name = json['utm_campaign'] ?? (json['utm_medium'] ?? json['utm_source']),
-        this.keyword = json['utm_term'];
+        this.keyword = json['utm_term'],
+        this.gclid = json['gclid'];
 }
 
 class _Session {
@@ -319,19 +325,42 @@ class _Event {
     }
     map['uid'] = this.tracker.visitor.userId;
 
-    // Campaign
-
-    if (this.tracker.campaign != null && this.tracker.campaign!.name != null) {
-      map['_rcn'] = this.tracker.campaign!.name;
-      if (this.tracker.campaign!.keyword != null) map['_rck'] = this.tracker.campaign!.keyword;
-    }
-
     // Session
     map['_idvc'] = this.tracker.session.visitCount.toString();
     map['_viewts'] = this.tracker.session.lastVisit!.millisecondsSinceEpoch ~/ 1000;
     map['_idts'] = this.tracker.session.firstVisit!.millisecondsSinceEpoch ~/ 1000;
 
-    map['url'] = '${this.tracker.contentBase}/$action';
+    var url = Uri.parse('${this.tracker.contentBase}/$action');
+
+    // Campaign
+
+    if (this.tracker.campaign != null) {
+      final entries = <String, String>{};
+
+      if (this.tracker.campaign!.name != null) {
+        map['_rcn'] = this.tracker.campaign!.name;
+        entries.addEntries([MapEntry('utm_campaign', this.tracker.campaign!.name!)]);
+      }
+      if (this.tracker.campaign!.keyword != null) {
+        map['_rck'] = this.tracker.campaign!.keyword;
+        entries.addEntries([MapEntry('utm_term', this.tracker.campaign!.keyword!)]);
+      }
+      if (this.tracker.campaign!.gclid != null) {
+        map['gclid'] = this.tracker.campaign!.gclid;
+        entries.addEntries([MapEntry('gclid', this.tracker.campaign!.gclid!)]);
+      }
+
+      if (url.hasQuery) {
+        entries.addAll(url.queryParameters);
+      }
+
+      if (entries.isNotEmpty) {
+        url = url.replace(queryParameters: entries);
+      }
+    }
+
+    map['url'] = url.toString();
+
     map['action_name'] = action;
 
     final locale = window.locale;
@@ -363,6 +392,7 @@ class _Event {
     if (eventName != null) {
       map['e_n'] = eventName;
     }
+
     return map;
   }
 }
@@ -376,10 +406,10 @@ class _MatomoDispatcher {
       if (!kIsWeb && event.tracker.userAgent != null) 'User-Agent': event.tracker.userAgent!,
     };
 
-    var map = event.toMap();
+    final map = event.toMap();
     var url = '$baseUrl?';
     for (String key in map.keys) {
-      var value = Uri.encodeFull(map[key].toString());
+      final value = Uri.encodeComponent(map[key].toString());
       url = '$url$key=$value&';
     }
     if (event.tracker._enableLog) event.tracker.log.fine(' -> $url');
