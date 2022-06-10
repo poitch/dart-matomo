@@ -273,7 +273,12 @@ class Campaign {
   Campaign.fromUtmParameters(Map<String, dynamic> json)
       : this.name = json['utm_campaign'] ?? (json['utm_medium'] ?? json['utm_source']),
         this.keyword = json['utm_term'],
-        this.identifiers = json['identifiers'] is Map<String, String> ? json['identifiers'] : null;
+        this.identifiers = Map.fromIterable(
+            json.keys.toList()
+              ..removeWhere(
+                  (element) => element == 'utm_campaign' || element == 'utm_medium' || element == 'utm_source' || element == 'utm_term'),
+            key: (key) => key,
+            value: (key) => json[key]);
 }
 
 class _Session {
