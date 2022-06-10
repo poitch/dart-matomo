@@ -348,8 +348,8 @@ class _Event {
       if (this.tracker.campaign!.identifiers != null) {
         final identifiers = tracker.campaign!.identifiers;
         identifiers?.forEach((key, value) {
-          map[key.toLowerCase()] = value;
-          entries.addEntries([MapEntry(key.toLowerCase(), value)]);
+          map[key] = value;
+          entries.addEntries([MapEntry(key, value)]);
         });
       }
 
