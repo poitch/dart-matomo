@@ -5,17 +5,16 @@ homepage: https://github.com/poitch/dart-matomo
 
 environment:
   sdk: '>=2.12.0 <3.0.0'
-  flutter: ">=1.17.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  fk_user_agent: ^2.0.1
-  http: ^0.13.1
+  fk_user_agent: ^2.1.0
+  http: ^0.13.6
   uuid: ^3.0.3
-  package_info_plus: ^3.0.1
+  package_info_plus: ^4.0.1
   shared_preferences: ^2.0.5
-  logging: ^1.0.1
+  logging: ^1.2.0
   universal_html: ^2.0.7
 
 dev_dependencies:
