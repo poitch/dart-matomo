@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
 class Foundation {}
 
 class MyHomePage extends TraceableStatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key, name: title);
+  MyHomePage({super.key,required this.title}) : super(name: title);
 
   final String title;
 

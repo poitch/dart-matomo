@@ -1,34 +1,35 @@
 PODS:
+  - fk_user_agent (2.0.0):
+    - Flutter
   - Flutter (1.0.0)
-  - flutter_user_agent (1.2.2):
+  - package_info_plus (0.4.5):
     - Flutter
-  - package_info (0.0.1):
+  - shared_preferences_foundation (0.0.1):
     - Flutter
-  - shared_preferences (0.0.1):
-    - Flutter
+    - FlutterMacOS
 
 DEPENDENCIES:
+  - fk_user_agent (from `.symlinks/plugins/fk_user_agent/ios`)
   - Flutter (from `Flutter`)
-  - flutter_user_agent (from `.symlinks/plugins/flutter_user_agent/ios`)
-  - package_info (from `.symlinks/plugins/package_info/ios`)
-  - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
+  - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
+  - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
 
 EXTERNAL SOURCES:
+  fk_user_agent:
+    :path: ".symlinks/plugins/fk_user_agent/ios"
   Flutter:
     :path: Flutter
-  flutter_user_agent:
-    :path: ".symlinks/plugins/flutter_user_agent/ios"
-  package_info:
-    :path: ".symlinks/plugins/package_info/ios"
-  shared_preferences:
-    :path: ".symlinks/plugins/shared_preferences/ios"
+  package_info_plus:
+    :path: ".symlinks/plugins/package_info_plus/ios"
+  shared_preferences_foundation:
+    :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
 
 SPEC CHECKSUMS:
-  Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
-  flutter_user_agent: 27c45d034dc31b80948d29998cea52cd3a7bf936
-  package_info: 873975fc26034f0b863a300ad47e7f1ac6c7ec62
-  shared_preferences: af6bfa751691cdc24be3045c43ec037377ada40d
+  fk_user_agent: 1f47ec39291e8372b1d692b50084b0d54103c545
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  package_info_plus: fd030dabf36271f146f1f3beacd48f564b0f17f7
+  shared_preferences_foundation: 5b919d13b803cadd15ed2dc053125c68730e5126
 
-PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
+PODFILE CHECKSUM: ef19549a9bc3046e7bb7d2fab4d021637c0c58a3
 
-COCOAPODS: 1.10.1
+COCOAPODS: 1.12.1
