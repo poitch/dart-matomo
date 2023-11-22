@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
 class Foundation {}
 
 class MyHomePage extends TraceableStatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key, name: title);
+  MyHomePage({required this.title, super.key});
 
   final String title;
 
@@ -48,7 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
   void _incrementCounter() {
-    MatomoTracker.trackEvent('IncrementCounter', 'Click');
+    // MatomoTracker.trackEvent('IncrementCounter', 'Click');
     setState(() {
       _counter++;
     });
